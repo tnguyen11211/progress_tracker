@@ -4,17 +4,17 @@
   </div>
   <ul class="topics__list">
     <li>
-      <a href="{% url 'home' %}">All <span>{{topics.count}}</span></a>
+      <a href="{% url 'home' %}">All <span>{{room_count_all}}</span></a>
     </li>
-    {% for topic in topics %}
+    {% for topic in topics %} {% if topic.room_set.all.count != 0 %}
     <li>
       <a href="{% url 'home' %}?q={{topic.name}}"
         >{{topic.name}} <span>{{topic.room_set.all.count}}</span></a
       >
     </li>
-    {% endfor %}
+    {% endif %} {% endfor %}
   </ul>
-  <a class="btn btn--link" href="topics.html">
+  <a class="btn btn--link" href="{% url 'topics' %}">
     More
     <svg
       version="1.1"
