@@ -25,6 +25,7 @@
   text-rendering: optimizeLegibility;
   /* color: inherit; */
   font-size: inherit;
+  word-wrap: break-word;
 }
 
 html {
@@ -57,7 +58,6 @@ img {
 }
 
 a {
-  display: inline-block;
   color: var(--color-main);
   text-decoration: none;
 }
@@ -406,6 +406,7 @@ a {
 
 .layout--3 > .container > div:nth-child(2) {
   flex-basis: 50%;
+  max-width: 55rem;
 }
 
 .layout--3 > .container > div:last-child {
@@ -424,11 +425,11 @@ a {
 .layout__box {
   width: 90%;
   max-width: 48rem;
-  min-height: 40rem;
+  min-height: 30rem;
   position: absolute;
-  top: 50%;
+  top: 15%;
   left: 50%;
-  transform: translate(-50%, -46%);
+  transform: translate(-50%);
   background-color: var(--color-dark);
   border-radius: 1rem;
   box-shadow: 1px 1px 6px 3px rgba(0, 0, 0, 0.1);
@@ -1009,6 +1010,7 @@ a {
   font-size: 2.4rem;
   font-weight: 500;
   color: var(--color-main);
+  max-width: 90%;
 }
 
 .room__hosted p {
