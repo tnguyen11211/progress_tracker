@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
-from .forms import RoomForm
+from .forms import RoomForm, UserForm
 from .models import Message, Room, Topic
 
 
@@ -26,8 +26,8 @@ def loginPage(request):
             login(request, user)
             return redirect('home')
         else:
-            messages.error(request, 'Username or password is invalid')
-
+            messages.error(request, "Invalid username or password")
+            
     context = {'page': page}
     return render(request, 'base/login_register.html', context)
 
@@ -49,7 +49,8 @@ def registerPage(request):
             login(request, user)
             return redirect('home')
         else:
-            messages.error(request, 'An error occurred during registration')
+            for error in form.errors:
+                messages.error(request, form.errors.get(error))
     
     return render(request, 'base/login_register.html', context)
 
@@ -63,12 +64,13 @@ def home(request):
         Q(host__username__icontains = q)
         )
 
-    topics = Topic.objects.all()
+    topics = Topic.objects.all()[0:5]
+    room_count_all = Room.objects.all().count()
     room_count = rooms.count()
-    room_messages = Message.objects.filter(Q(room__topic__name__icontains=q))
+    room_messages = Message.objects.filter(Q(room__topic__name__icontains=q))[0:5]
 
     context = {'rooms': rooms, 'topics': topics, 
-               'room_count': room_count, 'room_messages': room_messages}
+               'room_count': room_count, 'room_count_all':room_count_all, 'room_messages': room_messages}
     return render(request, 'base/home.html', context)
 
 def room(request, pk):
@@ -164,3 +166,28 @@ def deleteMessage(request, pk):
         return redirect('home')
 
     return render(request, 'base/delete.html', {'obj': message})
+
+@login_required(login_url='login')
+def updateUser(request):
+    user = request.user
+    form = UserForm(instance=user)
+
+    if request.method == 'POST':
+        form = UserForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('user-profile', pk=user.id)
+    
+    return render(request, 'base/update-user.html', {'form': form})
+
+def topicsPage(request):
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+
+    topics = Topic.objects.filter(Q(name__icontains = q))
+    rooms = Room.objects.all()
+
+    return render(request, 'base/topics.html', {'topics': topics, 'rooms': rooms})
+
+def activityPage(request):
+    room_messages = Message.objects.all()
+    return render(request, 'base/activity.html', {'room_messages': room_messages})
