@@ -7,9 +7,14 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
-from .forms import RoomForm, UserForm
-from .models import Message, Room, Topic
+from .forms import RoomForm, UserForm, ProfileForm
+from .models import Message, Room, Topic, Profile, Attendance, Tournament, ServiceHours, TeachingHours, PracticalScore
 
+def home(request):
+    students = Profile.objects.all()
+
+    context = {"students": students}
+    return render(request, 'base/home.html', context)
 
 def loginPage(request):
     page = 'login'
@@ -27,13 +32,15 @@ def loginPage(request):
             return redirect('home')
         else:
             messages.error(request, "Invalid username or password")
-            
+
     context = {'page': page}
     return render(request, 'base/login_register.html', context)
+
 
 def logoutUser(request):
     logout(request)
     return redirect('home')
+
 
 def registerPage(request):
     page = 'register'
@@ -51,27 +58,30 @@ def registerPage(request):
         else:
             for error in form.errors:
                 messages.error(request, form.errors.get(error))
-    
+
     return render(request, 'base/login_register.html', context)
 
-def home(request):
+
+def rooms(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
 
     rooms = Room.objects.filter(
-        Q(topic__name__icontains = q) |
-        Q(name__icontains = q) |
-        Q(description__icontains = q) |
-        Q(host__username__icontains = q)
-        )
+        Q(topic__name__icontains=q) |
+        Q(name__icontains=q) |
+        Q(description__icontains=q) |
+        Q(host__username__icontains=q)
+    )
 
     topics = Topic.objects.all()[0:5]
     room_count_all = Room.objects.all().count()
     room_count = rooms.count()
-    room_messages = Message.objects.filter(Q(room__topic__name__icontains=q))[0:5]
+    room_messages = Message.objects.filter(
+        Q(room__topic__name__icontains=q))[0:5]
 
-    context = {'rooms': rooms, 'topics': topics, 
-               'room_count': room_count, 'room_count_all':room_count_all, 'room_messages': room_messages}
-    return render(request, 'base/home.html', context)
+    context = {'rooms': rooms, 'topics': topics,
+               'room_count': room_count, 'room_count_all': room_count_all, 'room_messages': room_messages}
+    return render(request, 'base/rooms.html', context)
+
 
 def room(request, pk):
     room = Room.objects.get(id=pk)
@@ -87,15 +97,36 @@ def room(request, pk):
             room.participants.add(request.user)
         return redirect('room', pk=room.id)
 
-    context = {'room': room, 'room_messages': room_messages, 'participants': participants}
+    context = {'room': room, 'room_messages': room_messages,
+               'participants': participants}
     return render(request, 'base/room.html', context)
+
 
 def userProfile(request, pk):
     user = User.objects.get(id=pk)
+    profile = Profile.objects.filter(user=user)
     rooms = user.room_set.all()
     room_messages = user.message_set.all()
+    room_count_all = Room.objects.all().count()
     topics = Topic.objects.all()
-    context = {'user': user, 'rooms': rooms, 'room_messages': room_messages, 'topics': topics}
+
+    attendances = Attendance.objects.filter(profile__in=profile)
+    tournaments = Tournament.objects.filter(profile__in=profile)
+    teaching_hours = TeachingHours.objects.filter(profile__in=profile)
+    service_hours = ServiceHours.objects.filter(profile__in=profile)
+    practical_score = PracticalScore.objects.filter(profile__in=profile)
+
+    context = {'user': user, 
+               'rooms': rooms,
+               'room_messages': room_messages, 
+               'room_count_all': room_count_all, 
+               'topics': topics,
+               'attendances': attendances,
+               'tournaments': tournaments,
+               'teaching_hours': teaching_hours,
+               'service_hours': service_hours,
+               'practical_scores': practical_score
+               }
     return render(request, 'base/profile.html', context)
 
 @login_required(login_url='login')
@@ -109,15 +140,16 @@ def createRoom(request):
         topic, created = Topic.objects.get_or_create(name=topic_name)
 
         Room.objects.create(
-            host = request.user,
-            topic = topic,
-            name = request.POST.get('name'),
-            description = request.POST.get('description'),
+            host=request.user,
+            topic=topic,
+            name=request.POST.get('name'),
+            description=request.POST.get('description'),
         )
-        return redirect('home')
-        
+        return redirect('rooms')
+
     context = {'form': form, 'topics': topics, 'create_update': create_update}
     return render(request, 'base/room_form.html', context)
+
 
 @login_required(login_url='login')
 def updateRoom(request, pk):
@@ -138,8 +170,10 @@ def updateRoom(request, pk):
         room.save()
         return redirect('room', room.id)
 
-    context = {'form': form, 'topics': topics, 'room': room, 'create_update': create_update}
+    context = {'form': form, 'topics': topics,
+               'room': room, 'create_update': create_update}
     return render(request, 'base/room_form.html', context)
+
 
 @login_required(login_url='login')
 def deleteRoom(request, pk):
@@ -154,6 +188,7 @@ def deleteRoom(request, pk):
 
     return render(request, 'base/delete.html', {'obj': room})
 
+
 @login_required(login_url='login')
 def deleteMessage(request, pk):
     message = Message.objects.get(id=pk)
@@ -167,26 +202,32 @@ def deleteMessage(request, pk):
 
     return render(request, 'base/delete.html', {'obj': message})
 
+
 @login_required(login_url='login')
 def updateUser(request):
     user = request.user
-    form = UserForm(instance=user)
+    user_form = UserForm(instance=user)
+    profile_form = ProfileForm(instance=user.profile)
 
     if request.method == 'POST':
-        form = UserForm(request.POST, instance=user)
-        if form.is_valid():
-            form.save()
+        user_form = UserForm(request.POST, instance=user)
+        profile_form = ProfileForm(request.POST, request.FILES, instance=user.profile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
             return redirect('user-profile', pk=user.id)
-    
-    return render(request, 'base/update-user.html', {'form': form})
+
+    return render(request, 'base/update-user.html', {'user_form': user_form, 'profile_form': profile_form})
+
 
 def topicsPage(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
 
-    topics = Topic.objects.filter(Q(name__icontains = q))
+    topics = Topic.objects.filter(Q(name__icontains=q))
     rooms = Room.objects.all()
 
     return render(request, 'base/topics.html', {'topics': topics, 'rooms': rooms})
+
 
 def activityPage(request):
     room_messages = Message.objects.all()
