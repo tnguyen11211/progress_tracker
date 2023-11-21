@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image
@@ -41,7 +41,7 @@ class Profile(models.Model):
 
 class Attendance(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
-    date = models.DateField(default=datetime.date.today)
+    date = models.DateField(default=datetime.today())
 
     def __str__(self):
         return self.date.strftime("%b %d, %Y")
@@ -49,14 +49,14 @@ class Attendance(models.Model):
 class Tournament(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=200, null=True)
-    date = models.DateField(default=datetime.date.today)
+    date = models.DateField(default=datetime.today())
     
     def __str__(self):
         return self.name
 
 class TeachingHours(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
-    date = models.DateField(default=datetime.date.today)
+    date = models.DateField(default=datetime.today())
     hours = models.IntegerField(null=True)
 
     def __str__(self):
@@ -66,7 +66,7 @@ class TeachingHours(models.Model):
 class ServiceHours(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
     event = models.CharField(max_length=200)
-    date = models.DateField(default=datetime.date.today)
+    date = models.DateField(default=datetime.today())
     hours = models.IntegerField(null=True)
 
     def __str__(self):
@@ -75,7 +75,7 @@ class ServiceHours(models.Model):
     
 class PracticalScore(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
-    date = models.DateField(default=datetime.date.today)
+    date = models.DateField(default=datetime.today())
     score = models.IntegerField(null=True)
 
     def __str__(self):
