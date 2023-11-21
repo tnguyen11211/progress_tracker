@@ -6,12 +6,12 @@
       class="roomListRoom__author"
     >
       <div class="avatar avatar--small">
-        <img src="https://randomuser.me/api/portraits/women/11.jpg" />
+        <img src="{{room.host.profile.picture.url}}" />
       </div>
       <span>@{{room.host.username}}</span>
     </a>
     <div class="roomListRoom__actions">
-      <span>{{room.created|timesince}} ago</span>
+      <span>Created {{room.created|timesince}} ago</span>
     </div>
   </div>
   <div class="roomListRoom__content">

@@ -6,7 +6,7 @@
     <div class="room">
       <div class="room__top">
         <div class="room__topLeft">
-          <a href="{%  url 'home' %}">
+          <a href="{%  url 'rooms' %}">
             <svg
               version="1.1"
               xmlns="http://www.w3.org/2000/svg"
@@ -73,7 +73,7 @@
         <div class="room__header scroll">
           <div class="room__info">
             <h3>{{room.name}}</h3>
-            <span>{{room.created|timesince}} ago</span>
+            <span>Created {{room.created|timesince}} ago</span>
           </div>
           <div class="room__hosted">
             <p>Hosted By</p>
@@ -82,7 +82,7 @@
               class="room__author"
             >
               <div class="avatar avatar--small">
-                <img src="https://randomuser.me/api/portraits/men/37.jpg" />
+                <img src="{{room.host.profile.picture.url}}" />
               </div>
               <span>@{{room.host.username}}</span>
             </a>
@@ -101,9 +101,7 @@
                     class="thread__authorInfo"
                   >
                     <div class="avatar avatar--small">
-                      <img
-                        src="https://randomuser.me/api/portraits/men/37.jpg"
-                      />
+                      <img src="{{message.user.profile.picture.url}}" />
                     </div>
                     <span>@{{message.user.username}}</span>
                   </a>
@@ -160,7 +158,7 @@
         {% for user in participants %}
         <a href="{% url 'user-profile' user.id %}" class="participant">
           <div class="avatar avatar--medium">
-            <img src="https://randomuser.me/api/portraits/men/37.jpg" />
+            <img src="{{user.profile.picture.url}}" />
           </div>
           <p>
             {{user.username}}
