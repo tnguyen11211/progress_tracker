@@ -65,7 +65,7 @@ a {
 /*========== components ==========*/
 .container {
   max-width: 120rem;
-  width: 90%;
+  width: 100%;
   margin: auto;
 }
 
@@ -399,13 +399,32 @@ a {
   align-items: flex-start;
 }
 
+.layout--4 > .container > div:first-child {
+  flex-basis: 10%;
+  max-width: 22.5rem;
+}
+
+.layout--4 > .container > div:nth-child(2) {
+  flex-basis: 15%;
+  max-width: 55rem;
+}
+
+.layout--4 > .container > div:nth-child(3) {
+  flex-basis: 50%;
+  max-width: 55rem;
+}
+
+.layout--4 > .container > div:last-child {
+  flex-basis: 25%;
+}
+
 .layout--3 > .container > div:first-child {
-  flex-basis: 18%;
+  flex-basis: 10%;
   max-width: 22.5rem;
 }
 
 .layout--3 > .container > div:nth-child(2) {
-  flex-basis: 50%;
+  flex-basis: 65%;
   max-width: 55rem;
 }
 
@@ -520,7 +539,7 @@ a {
 }
 
 .form__group select {
-  color: var(--color-gray);
+  color: var(--color-light);
   font-weight: 400;
 }
 
@@ -551,6 +570,39 @@ a {
 
 .form__avatar label:hover {
   text-decoration: underline;
+}
+
+/*==============================
+=>  Side Nav
+================================*/
+
+.side_nav__list {
+  list-style: none;
+}
+
+.side_nav__list li a {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.2rem;
+  padding-left: 0.4rem;
+  font-weight: 500;
+  font-size: 2rem;
+  color: var(--color-light);
+  transition: all 0.3s ease-in-out;
+}
+
+.side_nav__list li a.active,
+.side_nav__list li a:hover {
+  color: var(--color-main);
+}
+
+.side_nav__list li a span {
+  padding: 0.5rem 1rem;
+  background-color: var(--color-dark);
+  border-radius: 3px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 /*==============================
@@ -620,21 +672,21 @@ a {
 =>  Room List
 ================================*/
 
-.roomList__header {
+.roomList__header, .studentList__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2.4rem;
 }
 
-.roomList__header h2 {
+.roomList__header h2, .studentList__header h2 {
   text-transform: uppercase;
   font-weight: 500;
   color: var(--color-light);
   letter-spacing: 1px;
 }
 
-.roomList__header p {
+.roomList__header p, .studentList__header p {
   font-weight: 500;
   color: var(--color-dark-light);
 }
@@ -720,6 +772,87 @@ a {
 }
 
 .roomListRoom__topic {
+  padding: 5px 1.5rem;
+  background-color: var(--color-dark-medium);
+  border-radius: 5rem;
+  font-weight: 500;
+  font-size: 1.3rem;
+}
+
+/*========== Student List Student ==========*/
+
+.studentListStudent {
+  margin-bottom: 1rem;
+  background-color: var(--color-dark);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.studentListStudent__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.studentListStudent__author {
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.studentListStudent__actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  position: relative;
+}
+
+.studentListStudent__actions span {
+  font-size: 1.4rem;
+  font-weight: 500;
+}
+
+.studentListStudent__content {
+  margin: 1rem 0;
+}
+
+.studentListStudent__content a {
+  font-size: 2rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  color: var(--color-light);
+  transition: all 0.3s ease-in-out;
+}
+
+.studentListStudent__content a:hover {
+  color: var(--color-main);
+}
+
+.studentListStudent__meta {
+  border-top: 1px solid var(--color-dark-medium);
+  padding-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.studentListStudent__joined {
+  color: var(--color-light-gray);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.4rem;
+  font-weight: 500;
+}
+
+.studentListStudent__joined svg {
+  fill: var(--color-main);
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.studentListStudent__topic {
   padding: 5px 1.5rem;
   background-color: var(--color-dark-medium);
   border-radius: 5rem;
@@ -902,7 +1035,6 @@ a {
 .room,
 .participants {
   background: var(--color-dark);
-  max-height: 87.5vh;
   border-radius: 0.7rem;
   overflow: hidden;
   position: relative;
@@ -965,10 +1097,9 @@ a {
 }
 
 .room__header {
-  max-height: 30vh;
+  max-height: 70vh;
   overflow-y: auto;
-  position: absolute;
-  width: 95%;
+  width: 100%;
   background: var(--color-dark);
   z-index: 999;
   top: 4.4rem;
@@ -986,7 +1117,7 @@ a {
 .room__box {
   padding-left: 2rem;
   padding-right: 2rem;
-  height: 80.5vh;
+  max-height: 140vh;
   /* overflow-y: auto; */
   padding-bottom: 0;
 }
@@ -995,7 +1126,7 @@ a {
   .room__box {
     padding-left: 2.5rem;
     padding-right: 2rem;
-    height: 80.5vh;
+    max-height: 140vh;
     overflow-y: auto;
     padding-bottom: 0;
   }
@@ -1004,6 +1135,11 @@ a {
 .room__info {
   display: flex;
   justify-content: space-between;
+  padding-right: 2rem;
+}
+
+.room__details {
+  padding-right: 1rem;
 }
 
 .room__info h3 {
@@ -1046,7 +1182,7 @@ a {
 .room__conversation {
   margin-top: 1rem;
   margin-bottom: 4rem;
-  height: 64%;
+  height: 80vh;
 }
 
 .threads h3 {
@@ -1060,15 +1196,14 @@ a {
   border-radius: 0.7rem;
   overflow-y: auto;
   height: 100%;
-  margin-top: 28vh;
   padding: 0 2rem 4rem 2rem;
 }
 
 .thread {
   border-left: 2px solid var(--color-dark);
   padding-left: 1rem;
-  margin: 2rem 0;
-  padding: 2rem;
+  margin: 1rem 0;
+  padding: 1rem;
 }
 
 .thread__top {
