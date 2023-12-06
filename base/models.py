@@ -1,26 +1,53 @@
-from datetime import datetime
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image
 
+class Attendance(models.Model):
+    date = models.DateField(default=timezone.now)
+
+    def __str__(self):
+        return self.date.strftime("%b %d, %Y")
+    
+    class Meta:
+        ordering = ['-date']
+
 class Profile(models.Model):
+    BROWN = 'Brown'
+    SR_BROWN = 'Sr. Brown'
+    RED = 'Red'
+    SR_RED = 'Sr. Red'
+    BLACK1 = '1st Dan Black Belt'
+    BLACK2 = '2nd Dan Black Belt'
+    BLACK3 = '3rd Dan Black Belt'
+    BLACK4 = '4th Dan Black Belt'
+    BLACK5 = '5th Dan Black Belt'
+
     BELT_RANKS = (
-        ('brown','Brown'),
-        ('sr_brown','Sr. Brown'),
-        ('red','Red'),
-        ('sr_red', 'Sr. Red'),
-        ('black_1','1st Dan Black Belt'),
-        ('black_2','2nd Dan Black Belt'),
-        ('black_3','3rd Dan Black Belt'),
-        ('black_4','4th Dan Black Belt'),
-        ('black_5','5th Dan Black Belt'),
+        (BROWN,'Brown'),
+        (SR_BROWN,'Sr. Brown'),
+        (RED,'Red'),
+        (SR_RED, 'Sr. Red'),
+        (BLACK1,'1st Dan Black Belt'),
+        (BLACK2,'2nd Dan Black Belt'),
+        (BLACK3,'3rd Dan Black Belt'),
+        (BLACK4,'4th Dan Black Belt'),
+        (BLACK5,'5th Dan Black Belt')
     )
     
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, null=True)
-    about = models.TextField(null=True)
+    about = models.TextField(null=True, blank=True)
     picture = models.ImageField(default="default.svg", upload_to='profile_pictures', null=True)
     rank = models.CharField(max_length=20, choices=BELT_RANKS, null=True, blank=True)
+    last_promoted = models.DateField(default=timezone.now)
+
+    attendances = models.ManyToManyField(Attendance, related_name='attendances')
+    
+    current_attendances = models.IntegerField(default=0, null=True)
+    current_tournaments = models.IntegerField(default=0, null=True)
+    current_hours = models.IntegerField(default=0, null=True)
+    current_score = models.IntegerField(default=0, null=True)
 
     def __str__(self):
         return f'{self.user.username}\'s Profile'
@@ -39,34 +66,18 @@ class Profile(models.Model):
                 # overwrite the larger image
                 img.save(self.picture.path)
 
-class Attendance(models.Model):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
-    date = models.DateField(default=datetime.today())
-
-    def __str__(self):
-        return self.date.strftime("%b %d, %Y")
-
 class Tournament(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=200, null=True)
-    date = models.DateField(default=datetime.today())
+    date = models.DateField(default=timezone.now)
     
     def __str__(self):
         return self.name
 
-class TeachingHours(models.Model):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
-    date = models.DateField(default=datetime.today())
-    hours = models.IntegerField(null=True)
-
-    def __str__(self):
-        string = self.date.strftime("%b %d, %Y") + " : " + str(self.hours)
-        return string
-
-class ServiceHours(models.Model):
+class LeadershipHours(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
     event = models.CharField(max_length=200)
-    date = models.DateField(default=datetime.today())
+    date = models.DateField(default=timezone.now)
     hours = models.IntegerField(null=True)
 
     def __str__(self):
@@ -75,7 +86,7 @@ class ServiceHours(models.Model):
     
 class PracticalScore(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
-    date = models.DateField(default=datetime.today())
+    date = models.DateField(default=timezone.now)
     score = models.IntegerField(null=True)
 
     def __str__(self):
