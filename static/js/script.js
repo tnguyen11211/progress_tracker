@@ -67,3 +67,62 @@ if (photoInput)
 // Scroll to Bottom
 const conversationThread = document.querySelector(".room__box");
 if (conversationThread) conversationThread.scrollTop = conversationThread.scrollHeight;
+
+// Circular Progress Bar based on https://www.youtube.com/watch?v=SKU2gExpkPI
+  function progressAnimation(
+    value,
+    currentValue,
+    circle,
+    degreeMultiplier,
+    maxValue,
+    color
+  ) {
+    let startValue = 0,
+      endValue = currentValue * degreeMultiplier,
+      speed = 1;
+    let progress = setInterval(() => {
+      if (currentValue != 0) {
+        startValue++;
+      }
+      else {
+        startValue = 0;
+      }
+
+      value.textContent = `${currentValue}/${maxValue}`;
+
+      circle.style.background = `conic-gradient(${color} ${
+        startValue
+      }deg, var(--color-light-gray) 0deg)`;
+
+      if (startValue >= endValue) {
+        clearInterval(progress);
+      }
+    }, speed);
+  }
+
+  function animateAll(category, degreeMultiplier, maxValue, color) {
+    const circularProgress = document.querySelectorAll(
+      ".circular-progress#" + category, 
+    ),
+    progressValue = document.querySelectorAll(".progress-value#" + category);
+
+    for (var i = 0; i < circularProgress.length; i++) {
+      circle = circularProgress[i];
+      value = progressValue[i];
+      currentValue = progressValue[i].textContent;
+
+      progressAnimation(
+        value,
+        currentValue,
+        circle,
+        degreeMultiplier,
+        maxValue,
+        color
+      );
+    }
+  }
+
+  animateAll("attendance", 15, 24, "orangered");
+  animateAll("tournament", 360, 1, "gold");
+  animateAll("hours", 14.4, 25, "mediumseagreen");
+  animateAll("practical", 3.6, 100, "dodgerblue");
