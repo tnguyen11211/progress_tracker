@@ -5,7 +5,7 @@
     <div class="layout__box">
       <div class="layout__boxHeader">
         <div class="layout__boxTitle">
-          <a href="{% url 'home' %}">
+          <a href="{% url 'user-profile' user.id %}">
             <svg
               version="1.1"
               xmlns="http://www.w3.org/2000/svg"
@@ -23,13 +23,45 @@
         </div>
       </div>
       <div class="layout__body">
-        <form class="form" action="" method="POST">
-          {% csrf_token %} {% for field in form %}
+        <form
+          class="form"
+          action=""
+          method="POST"
+          enctype="multipart/form-data"
+        >
+          <div class="form__group">
+            <label for="profile__picture">Picture</label>
+            {{profile_form.picture}}
+          </div>
+          <div class="form__group">
+            <label for="profile__name">Name</label>
+            {{profile_form.name}}
+          </div>
+          <div class="form__group">
+            <label for="profile__rank">Rank</label>
+            {{profile_form.rank}}
+          </div>
+          <div class="form__group">
+            <label for="profile__promoted">Last Promoted</label>
+            {{profile_form.last_promoted}}
+          </div>
+          <div class="form__group">
+            <label for="profile__about">About</label>
+            {{profile_form.about}}
+          </div>
+          {% csrf_token %} {% for field in user_form %}
           <div class="form__group">
             <label for="{{field.label}}">{{field.label}}</label>
             {{field}}
           </div>
-          {% endfor %}
+          {% endfor %} {% if messages %}
+          <br />
+          <ul class="messages">
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
 
           <div class="form__action">
             <a class="btn btn--dark" href="{{request.META.HTTP_REFERER}}"
