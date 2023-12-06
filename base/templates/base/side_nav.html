@@ -1,0 +1,15 @@
+<div class="side_nav">
+  <ul class="side_nav__list">
+    <li>
+      <a href="{% url 'home' %}">Home</a>
+    </li>
+    {% if request.user.is_authenticated %}
+    <li>
+      <a href="{% url 'user-profile' request.user.id %}">My Profile</a>
+    </li>
+    {% endif %}
+    <li>
+      <a href="{% url 'rooms' %}">Rooms</a>
+    </li>
+  </ul>
+</div>
