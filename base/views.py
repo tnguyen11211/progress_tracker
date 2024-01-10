@@ -1,56 +1,15 @@
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
-from .forms import RoomForm, UserForm, ProfileForm
-from .models import Message, Room, Topic, Profile, Tournament, LeadershipHours, PracticalScore
-
-def getRecentDates(model):
-    if timezone.now().month <= 3:
-        dates = model.filter(date__month__range=['01', '03'], date__year=timezone.now().year)
-    elif timezone.now().month > 3 and timezone.now().month <= 6:
-        dates = model.filter(date__month__range=['04', '06'], date__year=timezone.now().year)
-    elif timezone.now().month > 6 and timezone.now().month <= 9:
-        dates = model.filter(date__month__range=['07', '09'], date__year=timezone.now().year)
-    elif timezone.now().month > 9 and timezone.now().month <= 12:
-        dates = model.filter(date__month__range=['10', '12'], date__year=timezone.now().year)
-    else:
-        dates = model.all()
-
-    return dates
-
-def setProfileStats():
-    profiles = Profile.objects.all()
-    tournaments = getRecentDates(Tournament.objects)
-    hours = getRecentDates(LeadershipHours.objects)
-    practicals = getRecentDates(PracticalScore.objects)
-
-    for profile in profiles:
-        profile.current_attendances = getRecentDates(profile.attendances).count()
-
-        tournament_count = 0
-        for tournament in tournaments:
-            if profile == tournament.profile:
-                tournament_count += 1
-        profile.current_tournaments = tournament_count
-
-        hours_count = 0
-        for h in hours:
-            if profile == h.profile:
-                hours_count += h.hours
-        profile.current_hours = hours_count
-
-        for practical in practicals:
-            if profile == practical.profile:
-                profile.current_score = practical.score
-
-        profile.save()
+from .forms import RoomForm, UserForm, ProfileForm, AttendanceForm, TournamentForm, LeadershipHoursForm, PracticalScoreForm
+from .models import Attendance, Tournament, LeadershipHours, PracticalScore, Message, Room, Topic, Profile
 
 def home(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
@@ -59,7 +18,7 @@ def home(request):
         Q(user__username__icontains=q) |
         Q(name__icontains=q)
     )
-        
+
     context = {'profiles': profiles}
     return render(request, 'base/home.html', context)
 
@@ -100,8 +59,6 @@ def registerPage(request):
             user = form.save(commit=False)
             # change or clean form data here
             user.save()
-            user.profile.name = user.username
-            user.save()
             login(request, user)
             return redirect('home')
         else:
@@ -110,6 +67,268 @@ def registerPage(request):
 
     return render(request, 'base/login_register.html', context)
 
+def userProfile(request, pk):
+    user = User.objects.get(id=pk)
+    profile = user.profile
+
+    attendances = profile.get_recent_attendances()[:5]
+    tournaments = profile.get_recent_tournaments()[:5]
+    leadership_hours = profile.get_recent_leadership_hours()[:5]
+    practical_scores = profile.get_recent_practical_scores()[:5]
+
+    context = {'user': user, 
+               'attendances': attendances,
+               'tournaments': tournaments,
+               'leadership_hours': leadership_hours,
+               'practical_scores': practical_scores}
+    
+    return render(request, 'base/profile.html', context)
+
+@login_required(login_url='login')
+def updateUser(request):
+    user = request.user
+    user_form = UserForm(instance=user)
+    profile_form = ProfileForm(instance=user.profile)
+
+    if request.method == 'POST':
+        user_form = UserForm(request.POST, instance=user)
+        profile_form = ProfileForm(request.POST, request.FILES, instance=user.profile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            return redirect('user-profile', pk=user.id)
+        else:
+            for error in user_form.errors:
+                messages.error(request, user_form.errors.get(error))
+            for error in profile_form.errors:
+                messages.error(request, profile_form.errors.get(error))
+
+    return render(request, 'base/update-user.html', {'user_form': user_form, 'profile_form': profile_form})
+
+@login_required(login_url='login')
+def createAttendance(request):
+    profile = request.user.profile
+    form = AttendanceForm()
+    create_update = "Create"
+
+    if request.method == 'POST':
+        Attendance.objects.create(
+            profile=profile,
+            date=request.POST.get('date')
+        )
+        next = request.POST.get('next', '/')
+        return redirect(next)
+
+    context = {'form': form, 'create_update': create_update}
+    return render(request, 'base/stats_form.html', context)
+
+@login_required(login_url='login')
+def updateAttendance(request, pk):
+    attendance = Attendance.objects.get(id=pk)
+    form = AttendanceForm(instance=attendance)
+    create_update = "Update"
+
+    if request.user != attendance.profile.user:
+        return HttpResponse('Invalid operation. Users can only edit their own attendances.')
+
+    if request.method == 'POST':
+        attendance.date = request.POST.get('date')
+        attendance.save()
+        next = request.POST.get('next', '/')
+        return redirect(next)
+
+    context = {'form': form, 'create_update': create_update}
+    return render(request, 'base/stats_form.html', context)
+
+@login_required(login_url='login')
+def deleteAttendance(request, pk):
+    attendance = Attendance.objects.get(id=pk)
+
+    if request.user != attendance.profile.user:
+        return HttpResponse('Invalid operation. Users can only delete attendances they have created.')
+
+    if request.method == 'POST':
+        attendance.delete()
+        next = request.POST.get('next', '/')
+        return redirect(next)
+
+    return render(request, 'base/delete.html', {'obj': attendance})
+
+@login_required(login_url='login')
+def createTournament(request):
+    profile = request.user.profile
+    form = TournamentForm()
+    create_update = "Create"
+
+    if request.method == 'POST':
+        Tournament.objects.create(
+            profile=profile,
+            event=request.POST.get('event'),
+            date=request.POST.get('date')
+        )
+        next = request.POST.get('next', '/')
+        return redirect(next)
+
+    context = {'form': form, 'create_update': create_update}
+    return render(request, 'base/stats_form.html', context)
+
+@login_required(login_url='login')
+def updateTournament(request, pk):
+    tournament = Tournament.objects.get(id=pk)
+    form = TournamentForm(instance=tournament)
+    create_update = "Update"
+
+    if request.user != tournament.profile.user:
+        return HttpResponse('Invalid operation. Users can only edit their own tournaments.')
+
+    if request.method == 'POST':
+        tournament.event = request.POST.get('event')
+        tournament.date = request.POST.get('date')
+        tournament.save()
+        next = request.POST.get('next', '/')
+        return redirect(next)
+
+    context = {'form': form, 'create_update': create_update}
+    return render(request, 'base/stats_form.html', context)
+
+@login_required(login_url='login')
+def deleteTournament(request, pk):
+    tournament = Tournament.objects.get(id=pk)
+
+    if request.user != tournament.profile.user:
+        return HttpResponse('Invalid operation. Users can only delete tournaments they have created.')
+
+    if request.method == 'POST':
+        tournament.delete()
+        next = request.POST.get('next', '/')
+        return redirect(next)
+
+    return render(request, 'base/delete.html', {'obj': tournament})
+
+@login_required(login_url='login')
+def createLeadershipHours(request):
+    profile = request.user.profile
+    form = LeadershipHoursForm()
+    create_update = "Create"
+
+    if request.method == 'POST':
+        LeadershipHours.objects.create(
+            profile=profile,
+            event=request.POST.get('event'),
+            date=request.POST.get('date'),
+            hours=request.POST.get('hours')
+        )
+        next = request.POST.get('next', '/')
+        return redirect(next)
+
+    context = {'form': form, 'create_update': create_update}
+    return render(request, 'base/stats_form.html', context)
+
+@login_required(login_url='login')
+def updateLeadershipHours(request, pk):
+    leadership_hour = LeadershipHours.objects.get(id=pk)
+    form = LeadershipHoursForm(instance=leadership_hour)
+    create_update = "Update"
+
+    if request.user != leadership_hour.profile.user:
+        return HttpResponse('Invalid operation. Users can only edit their own leadership hours.')
+
+    if request.method == 'POST':
+        leadership_hour.event = request.POST.get('event')
+        leadership_hour.date = request.POST.get('date')
+        leadership_hour.hours = request.POST.get('hours')
+        leadership_hour.save()
+        next = request.POST.get('next', '/')
+        return redirect(next)
+
+    context = {'form': form, 'create_update': create_update}
+    return render(request, 'base/stats_form.html', context)
+
+@login_required(login_url='login')
+def deleteLeadershipHours(request, pk):
+    leadership_hour = LeadershipHours.objects.get(id=pk)
+
+    if request.user != leadership_hour.profile.user:
+        return HttpResponse('Invalid operation. Users can only delete leadership hours they have created.')
+
+    if request.method == 'POST':
+        leadership_hour.delete()
+        next = request.POST.get('next', '/')
+        return redirect(next)
+
+    return render(request, 'base/delete.html', {'obj': leadership_hour})
+
+@login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
+def createPracticalScore(request):
+    profile = request.user.profile
+    form = PracticalScoreForm()
+    create_update = "Create"
+
+    if request.method == 'POST':
+        PracticalScore.objects.create(
+            profile=profile,
+            date=request.POST.get('date'),
+            score=request.POST.get('score')
+        )
+        next = request.POST.get('next', '/')
+        return redirect(next)
+
+    context = {'form': form, 'create_update': create_update}
+    return render(request, 'base/stats_form.html', context)
+
+@login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
+def updatePracticalScore(request, pk):
+    practical_score = PracticalScore.objects.get(id=pk)
+    form = PracticalScoreForm(instance=practical_score)
+    create_update = "Update"
+
+    if request.user != practical_score.profile.user:
+        return HttpResponse('Invalid operation. Users can only edit their own practical scores.')
+
+    if request.method == 'POST':
+        practical_score.date = request.POST.get('date')
+        practical_score.score = request.POST.get('score')
+        practical_score.save()
+        next = request.POST.get('next', '/')
+        return redirect(next)
+
+    context = {'form': form, 'create_update': create_update}
+    return render(request, 'base/stats_form.html', context)
+
+@login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
+def deletePracticalScore(request, pk):
+    practical_score = PracticalScore.objects.get(id=pk)
+
+    if request.user != practical_score.profile.user:
+        return HttpResponse('Invalid operation. Users can only delete practical scores they have created.')
+
+    if request.method == 'POST':
+        practical_score.delete()
+        next = request.POST.get('next', '/')
+        return redirect(next)
+
+    return render(request, 'base/delete.html', {'obj': practical_score})
+
+@login_required(login_url='login')
+def statsPage(request, pk):
+    profile = Profile.objects.get(id=pk)
+    attendances = Attendance.objects.filter(profile=profile)
+    tournaments = Tournament.objects.filter(profile=profile)
+    hours = LeadershipHours.objects.filter(profile=profile)
+    scores = PracticalScore.objects.filter(profile=profile)
+
+    context = {
+        'profile': profile,
+        'attendances': attendances,
+        'tournaments': tournaments,
+        'hours': hours,
+        'scores': scores
+    }
+
+    return render(request, 'base/stats.html', context)
 
 def rooms(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
@@ -153,33 +372,6 @@ def room(request, pk):
                'participants': participants}
     return render(request, 'base/room.html', context)
 
-
-def userProfile(request, pk):
-    user = User.objects.get(id=pk)
-    profile = user.profile
-    rooms = user.room_set.all()
-    room_messages = user.message_set.all()
-    room_count_all = Room.objects.all().count()
-    topics = Topic.objects.all()
-
-    attendances = profile.attendances.all()
-    tournaments = Tournament.objects.filter(profile=profile)
-    hours = LeadershipHours.objects.filter(profile=profile)
-    practical_scores = PracticalScore.objects.filter(profile=profile)
-
-    context = {'user': user,
-               'rooms': rooms,
-               'room_messages': room_messages, 
-               'room_count_all': room_count_all, 
-               'topics': topics,
-               'attendances': attendances,
-               'tournaments': tournaments,
-               'hours': hours,
-               'practical_scores': practical_scores
-               }
-    
-    return render(request, 'base/profile.html', context)
-
 @login_required(login_url='login')
 def createRoom(request):
     form = RoomForm()
@@ -200,7 +392,6 @@ def createRoom(request):
 
     context = {'form': form, 'topics': topics, 'create_update': create_update}
     return render(request, 'base/room_form.html', context)
-
 
 @login_required(login_url='login')
 def updateRoom(request, pk):
@@ -225,7 +416,6 @@ def updateRoom(request, pk):
                'room': room, 'create_update': create_update}
     return render(request, 'base/room_form.html', context)
 
-
 @login_required(login_url='login')
 def deleteRoom(request, pk):
     room = Room.objects.get(id=pk)
@@ -238,7 +428,6 @@ def deleteRoom(request, pk):
         return redirect('home')
 
     return render(request, 'base/delete.html', {'obj': room})
-
 
 @login_required(login_url='login')
 def deleteMessage(request, pk):
@@ -253,30 +442,6 @@ def deleteMessage(request, pk):
 
     return render(request, 'base/delete.html', {'obj': message})
 
-
-@login_required(login_url='login')
-def updateUser(request):
-    user = request.user
-    user_form = UserForm(instance=user)
-    profile_form = ProfileForm(instance=user.profile)
-
-    if request.method == 'POST':
-        user_form = UserForm(request.POST, instance=user)
-        profile_form = ProfileForm(request.POST, request.FILES, instance=user.profile)
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            setProfileStats()
-            return redirect('user-profile', pk=user.id)
-        else:
-            for error in user_form.errors:
-                messages.error(request, user_form.errors.get(error))
-            for error in profile_form.errors:
-                messages.error(request, profile_form.errors.get(error))
-
-    return render(request, 'base/update-user.html', {'user_form': user_form, 'profile_form': profile_form})
-
-
 def topicsPage(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
 
@@ -284,7 +449,6 @@ def topicsPage(request):
     rooms = Room.objects.all()
 
     return render(request, 'base/topics.html', {'topics': topics, 'rooms': rooms})
-
 
 def activityPage(request):
     room_messages = Message.objects.all()
