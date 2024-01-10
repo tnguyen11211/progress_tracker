@@ -70,11 +70,9 @@ if (conversationThread) conversationThread.scrollTop = conversationThread.scroll
 
 // Circular Progress Bar based on https://www.youtube.com/watch?v=SKU2gExpkPI
   function progressAnimation(
-    value,
     currentValue,
     circle,
     degreeMultiplier,
-    maxValue,
     color
   ) {
     let startValue = 0,
@@ -88,11 +86,9 @@ if (conversationThread) conversationThread.scrollTop = conversationThread.scroll
         startValue = 0;
       }
 
-      value.textContent = `${currentValue}/${maxValue}`;
-
       circle.style.background = `conic-gradient(${color} ${
         startValue
-      }deg, var(--color-light-gray) 0deg)`;
+      }deg, var(--color-dark-medium) 0deg)`;
 
       if (startValue >= endValue) {
         clearInterval(progress);
@@ -100,23 +96,24 @@ if (conversationThread) conversationThread.scrollTop = conversationThread.scroll
     }, speed);
   }
 
-  function animateAll(category, degreeMultiplier, maxValue, color) {
+  function animateAll(category, degreeMultiplier, max, color) {
     const circularProgress = document.querySelectorAll(
       ".circular-progress#" + category, 
     ),
     progressValue = document.querySelectorAll(".progress-value#" + category);
+    maxValue = document.querySelectorAll(".max-value#" + category);
 
     for (var i = 0; i < circularProgress.length; i++) {
       circle = circularProgress[i];
       value = progressValue[i];
       currentValue = progressValue[i].textContent;
+      value.textContent = `${currentValue}`;
+      maxValue[i].textContent = `${max}`;
 
       progressAnimation(
-        value,
         currentValue,
         circle,
         degreeMultiplier,
-        maxValue,
         color
       );
     }
