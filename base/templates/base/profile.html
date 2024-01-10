@@ -4,39 +4,42 @@
   <div class="container">
     {% include 'base/side_nav.html' %}
 
-    <!-- Room List Start -->
-    <div class="roomList">
+    <!-- Profile List Start -->
+    <div class="profileList">
       <div class="profile">
         <div class="profile__avatar">
           <div class="avatar avatar--large active">
             <img src="{{user.profile.picture.url}}" />
           </div>
-        </div>
-        <div class="profile__info">
-          <h3>{{user.profile.name}}</h3>
-          <p>@{{user.username}}</p>
-          <p>Rank: {{user.profile.rank}}</p>
           {% if request.user == user %}
           <a href="{% url 'update-user' %}" class="btn btn--main btn--pill"
             >Edit Profile</a
           >
           {% endif %}
         </div>
-        <div class="profile__about">
-          <h3>About</h3>
-          <p>{{user.profile.about}}</p>
+        <div class="profile__info">
+          <span>
+            <h3>{{user.profile.name}}</h3>
+            <p>@{{user.username}}</p>
+          </span>
+          <p>Rank: {{user.profile.rank}}</p>
+          <p>Last Promoted: {{user.profile.last_promoted}}</p>
         </div>
       </div>
-      <div>
-        <h1>Current Progress</h1>
+      <div class="profile__about">
+        <h3>About</h3>
+        <p>{{user.profile.about}}</p>
       </div>
+
+      <!-- Current Progress Start -->
+      {% include 'base/current_progress.html' %}
+      <!-- Current Progress End -->
+
+      <!-- Stats Feed Start -->
       {% include 'base/stats_feed.html' %}
-      <div>
-        <h1>Attendances</h1>
-      </div>
-      {% include 'base/attendance_feed.html' %}
+      <!-- Stats Feed End -->
     </div>
-    <!-- Room List End -->
+    <!-- Profile List End -->
 
     <!-- Activities Start -->
     {% include 'base/activity_component.html' %}
