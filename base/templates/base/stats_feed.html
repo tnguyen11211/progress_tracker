@@ -1,49 +1,150 @@
-<div class="profileListProfile">
-  <div class="ListProfile__header">
-    <a
-      href="{% url 'user-profile' user.id %}"
-      class="profileListProfile__author"
+<div class="profileList__header">
+  <h2>Attendances</h2>
+  {% if request.user == user %}
+  <a class="btn btn--mini" href="{% url 'create-attendance' %}">
+    <svg
+      version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
     >
-      <div class="avatar avatar--small">
-        <img src="{{user.profile.picture.url}}" />
-      </div>
-      <span>@{{user.username}}</span>
-    </a>
-  </div>
-  <div class="profileListProfile__content">
-    <div class="progress-wrapper">
-      <div class="circular-progress" id="attendance">
-        <span class="progress-value" id="attendance"
-          >{{user.profile.current_attendances}}</span
-        >
-      </div>
-      <span>Attendances</span>
+      <title>add</title>
+      <path
+        d="M16.943 0.943h-1.885v14.115h-14.115v1.885h14.115v14.115h1.885v-14.115h14.115v-1.885h-14.115v-14.115z"
+      ></path>
+    </svg>
+    Add Attendance
+  </a>
+  {% endif %}
+</div>
+<div class="stats">
+  {% for attendance in attendances%}
+  <div class="stats__box">
+    <div class="stats__content">
+      <span>Date: {{attendance.date}}</span>
     </div>
-    <div class="progress-wrapper">
-      <div class="circular-progress" id="tournament">
-        <span class="progress-value" id="tournament"
-          >{{user.profile.current_tournaments}}</span
-        >
-      </div>
-      <span>Tournaments</span>
-    </div>
-    {% if 'Black' in user.profile.rank %}
-    <div class="progress-wrapper">
-      <div class="circular-progress" id="hours">
-        <span class="progress-value" id="hours"
-          >{{user.profile.current_hours}}</span
-        >
-      </div>
-      <span>Leadership Hours</span>
+    {% if request.user == user %}
+    <div class="stats__actions">
+      <a href="{% url 'update-attendance' attendance.id %}"> edit </a>
+      <a href="{% url 'delete-attendance' attendance.id %}"> delete </a>
     </div>
     {% endif %}
-    <div class="progress-wrapper">
-      <div class="circular-progress" id="practical">
-        <span class="progress-value" id="practical"
-          >{{user.profile.current_score}}</span
-        >
-      </div>
-      <span>Practical Score</span>
-    </div>
   </div>
+  {% endfor %}
+  <a href="{% url 'attendances' user.profile.id %}"> All Attendances </a>
+</div>
+<div class="profileList__header">
+  <h2>Tournaments</h2>
+  {% if request.user == user %}
+  <a class="btn btn--mini" href="{% url 'create-tournament' %}">
+    <svg
+      version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+    >
+      <title>add</title>
+      <path
+        d="M16.943 0.943h-1.885v14.115h-14.115v1.885h14.115v14.115h1.885v-14.115h14.115v-1.885h-14.115v-14.115z"
+      ></path>
+    </svg>
+    Add Tournament
+  </a>
+  {% endif %}
+</div>
+<div class="stats">
+  {% for tournament in tournaments%}
+  <div class="stats__box">
+    <div class="stats__content">
+      <span>Event: {{tournament.event}}</span>
+      <span>Date: {{tournament.date}}</span>
+    </div>
+    {% if request.user == user %}
+    <div class="stats__actions">
+      <a href="{% url 'update-tournament' tournament.id %}"> edit </a>
+      <a href="{% url 'delete-tournament' tournament.id %}"> delete </a>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+  <a href="{% url 'tournaments' user.profile.id %}"> All Tournaments </a>
+</div>
+{% if 'Black' in user.profile.rank %}
+<div class="profileList__header">
+  <h2>Leadership Hours</h2>
+  {% if request.user == user %}
+  <a class="btn btn--mini" href="{% url 'create-leadership-hours' %}">
+    <svg
+      version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+    >
+      <title>add</title>
+      <path
+        d="M16.943 0.943h-1.885v14.115h-14.115v1.885h14.115v14.115h1.885v-14.115h14.115v-1.885h-14.115v-14.115z"
+      ></path>
+    </svg>
+    Add Hours
+  </a>
+  {% endif %}
+</div>
+<div class="stats">
+  {% for leadership in leadership_hours %}
+  <div class="stats__box">
+    <div class="stats__content">
+      <span>Event: {{leadership.event}}</span>
+      <span>Date: {{leadership.date}}</span>
+      <span>Hours: {{leadership.hours}}</span>
+    </div>
+    {% if request.user == user %}
+    <div class="stats__actions">
+      <a href="{% url 'update-leadership-hours' leadership.id %}"> edit </a>
+      <a href="{% url 'delete-leadership-hours' leadership.id %}"> delete </a>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+  <a href="{% url 'leadership-hours' user.profile.id %}"> All Hours </a>
+</div>
+{% endif %}
+<div class="profileList__header">
+  <h2>Practical Scores</h2>
+  {% if request.user.is_superuser %}
+  <a class="btn btn--mini" href="{% url 'create-practical-score' %}">
+    <svg
+      version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+    >
+      <title>add</title>
+      <path
+        d="M16.943 0.943h-1.885v14.115h-14.115v1.885h14.115v14.115h1.885v-14.115h14.115v-1.885h-14.115v-14.115z"
+      ></path>
+    </svg>
+    Add Score
+  </a>
+  {% endif %}
+</div>
+<div class="stats">
+  {% for practical_score in practical_scores %}
+  <div class="stats__box">
+    <div class="stats__content">
+      <span>Date: {{practical_score.date}}</span>
+      <span>Score: {{practical_score.score}}</span>
+    </div>
+    {% if request.user.is_superuser %}
+    <div class="stats__actions">
+      <a href="{% url 'update-practical-score' practical_score.id %}"> edit </a>
+      <a href="{% url 'delete-practical-score' practical_score.id %}"> delete </a>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+  <a href="{% url 'practical-scores' user.profile.id %}"> All Scores </a>
 </div>
