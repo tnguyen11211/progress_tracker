@@ -1,0 +1,64 @@
+<div class="profileList__header">
+  <h2>Current Progress</h2>
+</div>
+<div class="profileListProfile">
+  <div class="profileListProfile__header">
+    <a
+      href="{% url 'user-profile' user.id %}"
+      class="profileListProfile__author"
+    >
+      <div class="avatar avatar--small">
+        <img src="{{user.profile.picture.url}}" />
+      </div>
+      <span>@{{user.username}}</span>
+    </a>
+  </div>
+  <div class="profileListProfile__content">
+    <div class="circular-progress-wrapper">
+      <div class="circular-progress" id="attendance">
+        <span>
+          <span class="progress-value" id="attendance"
+            >{{user.profile.current_attendances}}</span
+          >
+          <span class="max-value" id="attendance"></span>
+        </span>
+      </div>
+      <span class="progress-label">Attendances</span>
+    </div>
+    <div class="circular-progress-wrapper">
+      <div class="circular-progress" id="tournament">
+        <span>
+          <span class="progress-value" id="tournament"
+            >{{user.profile.current_tournaments}}</span
+          >
+          <span class="max-value" id="tournament"></span>
+        </span>
+      </div>
+      <span class="progress-label">Tournaments</span>
+    </div>
+    {% if 'Black' in user.profile.rank %}
+    <div class="circular-progress-wrapper">
+      <div class="circular-progress" id="hours">
+        <span>
+          <span class="progress-value" id="hours"
+            >{{user.profile.current_leadership_hours}}</span
+          >
+          <span class="max-value" id="hours"></span>
+        </span>
+      </div>
+      <span class="progress-label">Leadership Hours</span>
+    </div>
+    {% endif %}
+    <div class="circular-progress-wrapper">
+      <div class="circular-progress" id="practical">
+        <span>
+          <span class="progress-value" id="practical"
+            >{{user.profile.current_practical_score}}</span
+          >
+          <span class="max-value" id="practical"></span>
+        </span>
+      </div>
+      <span class="progress-label">Practical Score</span>
+    </div>
+  </div>
+</div>
