@@ -25,8 +25,7 @@ SECRET_KEY = 'django-insecure-1-#3@09$m8c)ssf=fdi285#b%mb_e50q6+ofth)3_v9v1x81vx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '.vercel.app']
-
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -83,12 +82,12 @@ WSGI_APPLICATION = 'progress_tracker.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'test',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'railway',
         'USER': 'postgres',
-        'PASSWORD': 'admin',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'PASSWORD': '3C2AEd3EfggDE-FB215c4c2bfaDCcE-C',
+        'HOST': 'monorail.proxy.rlwy.net',
+        'PORT': '40352',
     }
 }
 
@@ -134,9 +133,9 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static'
 ]
 
-MEDIA_ROOT = BASE_DIR / 'static/images'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-STATIC_ROOT = BASE_DIR/'staticfiles'
+MEDIA_ROOT = BASE_DIR / 'static/images'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
