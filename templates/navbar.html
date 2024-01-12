@@ -32,7 +32,7 @@
       <div class="header__user">
         <a href="{% url 'user-profile' request.user.id %}">
           <div class="avatar avatar--medium active">
-            <img src="{% static {{request.user.profile.picture.url}} %}" />
+            <img src="{% static request.user.profile.picture.url %}" />
           </div>
           <p>
             {{request.user.profile.name}}
