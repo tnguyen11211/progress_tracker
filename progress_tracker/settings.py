@@ -31,16 +31,19 @@ DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 CSRF_TRUSTED_ORIGINS = [
     'https://progress.bluedragonacademy.com',
     'http://127.0.0.1:8000',
+    'https://progress-tracker-app-test.up.railway.app',
 ]
 
 ALLOWED_HOSTS = [
     'progress.bluedragonacademy.com',
     '127.0.0.1',
+    'progress-tracker-app-test.up.railway.app'
 ]
 
 CORS_ORIGIN_WHITELIST = [
     'https://progress.bluedragonacademy.com',
     'http://127.0.0.1:8000',
+    'https://progress-tracker-app-test.up.railway.app'
 ]
 
 # Application definition
