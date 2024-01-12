@@ -1,1 +1,1 @@
-web: python manage.py migrate && gunicorn progress_tracker.wsgi && collectstatic
+web: python manage.py migrate collectstatic && gunicorn progress_tracker.wsgi
