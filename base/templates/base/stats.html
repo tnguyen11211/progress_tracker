@@ -4,7 +4,7 @@
     <div class="layout__box">
       <div class="layout__boxHeader">
         <div class="layout__boxTitle">
-          <a href="{{ request.META.HTTP_REFERER }}">
+          <a href="{% url 'user-profile' profile.id %}">
             <svg
               version="1.1"
               xmlns="http://www.w3.org/2000/svg"
