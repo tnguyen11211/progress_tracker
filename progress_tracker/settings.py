@@ -27,14 +27,17 @@ DEBUG = True
 
 CSRF_TRUSTED_ORIGINS = [
     'https://progress.bluedragonacademy.com',
+    'http://127.0.0.1:8000',
 ]
 
 ALLOWED_HOSTS = [
     'progress.bluedragonacademy.com',
+    '127.0.0.1',
 ]
 
 CORS_ORIGIN_WHITELIST = [
     'https://progress.bluedragonacademy.com',
+    'http://127.0.0.1:8000',
 ]
 
 # Application definition
@@ -55,7 +58,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    #'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
