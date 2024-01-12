@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 #SECRET_KEY = 'django-insecure-1-#3@09$m8c)ssf=fdi285#b%mb_e50q6+ofth)3_v9v1x81vx'
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
+SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = True
@@ -31,16 +31,19 @@ DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 CSRF_TRUSTED_ORIGINS = [
     'https://progress.bluedragonacademy.com',
     'http://127.0.0.1:8000',
+    'https://progress-tracker-app-test.up.railway.app',
 ]
 
 ALLOWED_HOSTS = [
     'progress.bluedragonacademy.com',
     '127.0.0.1',
+    'progress-tracker-app-test.up.railway.app'
 ]
 
 CORS_ORIGIN_WHITELIST = [
     'https://progress.bluedragonacademy.com',
     'http://127.0.0.1:8000',
+    'https://progress-tracker-app-test.up.railway.app'
 ]
 
 # Application definition
