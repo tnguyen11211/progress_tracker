@@ -1,5 +1,6 @@
 {% load static %}
 {% for profile in profiles %}
+{% if profile.name != 'admin' %}
 <div class="profileListProfile">
   <div class="profileListProfile__header">
     <a
@@ -61,4 +62,5 @@
     </div>
   </div>
 </div>
+{% endif %}
 {% endfor %}
