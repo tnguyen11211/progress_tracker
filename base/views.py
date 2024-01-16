@@ -19,7 +19,9 @@ def home(request):
         Q(name__icontains=q)
     )
 
-    context = {'profiles': profiles}
+    time = timezone.now
+
+    context = {'profiles': profiles, 'time': time}
     return render(request, 'base/home.html', context)
 
 def loginPage(request):
