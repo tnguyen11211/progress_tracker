@@ -19,7 +19,7 @@ def home(request):
         Q(name__icontains=q)
     )
 
-    time = timezone.now
+    time = timezone.localdate
 
     context = {'profiles': profiles, 'time': time}
     return render(request, 'base/home.html', context)
