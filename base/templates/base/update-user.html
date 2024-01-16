@@ -29,10 +29,10 @@
           method="POST"
           enctype="multipart/form-data"
         >
-          <div class="form__group">
+          {% comment %} <div class="form__group">
             <label for="profile__picture">Picture</label>
             {{profile_form.picture}}
-          </div>
+          </div> {% endcomment %}
           <div class="form__group">
             <label for="profile__name">Name</label>
             {{profile_form.name}}
