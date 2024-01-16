@@ -1,3 +1,4 @@
+{% load static %}
 {% for profile in profiles %}
 <div class="profileListProfile">
   <div class="profileListProfile__header">
@@ -6,7 +7,7 @@
       class="profileListProfile__author"
     >
       <div class="avatar avatar--small">
-        <img src="{{profile.picture.url}}" />
+        <img src="{% static profile.picture.url %}" />
       </div>
       <span>{{profile.name}} @{{profile.user.username}}</span>
     </a>
