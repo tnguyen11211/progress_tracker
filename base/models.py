@@ -102,7 +102,7 @@ class Profile(models.Model):
 
 class Attendance(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, related_name='attendance')
-    date = models.DateField(default=timezone.now)
+    date = models.DateField(default=timezone.localdate)
 
     def __str__(self):
         return self.__class__.__name__ + " for " + self.profile.name + " on " + self.date.strftime("%b %d, %Y")
