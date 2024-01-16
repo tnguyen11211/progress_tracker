@@ -8,8 +8,8 @@
       <a href="{% url 'user-profile' request.user.id %}">My Profile</a>
     </li>
     {% endif %}
-    <li>
+    {% comment %} <li>
       <a href="{% url 'rooms' %}">Rooms</a>
-    </li>
+    </li> {% endcomment %}
   </ul>
 </div>
