@@ -4,14 +4,14 @@ from django.utils import timezone
 from PIL import Image
 
 def getRecentDates(model, profile):
-    if timezone.now().month <= 3:
-        dates = model.objects.filter(date__month__range=['01', '03'], date__year=timezone.now().year, profile=profile)
-    elif timezone.now().month > 3 and timezone.now().month <= 6:
-        dates = model.objects.filter(date__month__range=['04', '06'], date__year=timezone.now().year, profile=profile)
-    elif timezone.now().month > 6 and timezone.now().month <= 9:
-        dates = model.objects.filter(date__month__range=['07', '09'], date__year=timezone.now().year, profile=profile)
-    elif timezone.now().month > 9 and timezone.now().month <= 12:
-        dates = model.objects.filter(date__month__range=['10', '12'], date__year=timezone.now().year, profile=profile)
+    if timezone.localdate().month <= 3:
+        dates = model.objects.filter(date__month__range=['01', '03'], date__year=timezone.localdate().year, profile=profile)
+    elif timezone.localdate().month > 3 and timezone.localdate().month <= 6:
+        dates = model.objects.filter(date__month__range=['04', '06'], date__year=timezone.localdate().year, profile=profile)
+    elif timezone.localdate().month > 6 and timezone.localdate().month <= 9:
+        dates = model.objects.filter(date__month__range=['07', '09'], date__year=timezone.localdate().year, profile=profile)
+    elif timezone.localdate().month > 9 and timezone.localdate().month <= 12:
+        dates = model.objects.filter(date__month__range=['10', '12'], date__year=timezone.localdate().year, profile=profile)
     else:
         dates = model.objects.filter(profile=profile)
 
@@ -45,7 +45,7 @@ class Profile(models.Model):
     about = models.TextField(null=True, blank=True)
     picture = models.ImageField(default="default.svg", upload_to='profile_pictures', null=True)
     rank = models.CharField(max_length=20, choices=BELT_RANKS, null=True, blank=True)
-    last_promoted = models.DateField(default=timezone.now)
+    last_promoted = models.DateField(default=timezone.localdate)
 
     @property
     def current_attendances(self):
@@ -113,7 +113,7 @@ class Attendance(models.Model):
 class Tournament(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, related_name='tournament')
     event = models.CharField(max_length=30, null=True)
-    date = models.DateField(default=timezone.now)
+    date = models.DateField(default=timezone.localdate)
     
     def __str__(self):
         return self.__class__.__name__ + " for " + self.profile.name + " for " + self.event + " on " + self.date.strftime("%b %d, %Y")
@@ -124,7 +124,7 @@ class Tournament(models.Model):
 class LeadershipHours(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, related_name='leadership_hour')
     event = models.CharField(max_length=30)
-    date = models.DateField(default=timezone.now)
+    date = models.DateField(default=timezone.localdate)
     hours = models.IntegerField(null=True)
 
     def __str__(self):
@@ -133,7 +133,7 @@ class LeadershipHours(models.Model):
 
 class PracticalScore(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, related_name='practical_score')
-    date = models.DateField(default=timezone.now)
+    date = models.DateField(default=timezone.localdate)
     score = models.IntegerField(null=True)
 
     def __str__(self):

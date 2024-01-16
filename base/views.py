@@ -19,9 +19,7 @@ def home(request):
         Q(name__icontains=q)
     )
 
-    time = timezone.localdate
-
-    context = {'profiles': profiles, 'time': time}
+    context = {'profiles': profiles}
     return render(request, 'base/home.html', context)
 
 def loginPage(request):
