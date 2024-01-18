@@ -43,7 +43,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=30, null=True)
     about = models.TextField(null=True, blank=True)
-    picture = models.ImageField(default="default.svg", upload_to='profile_pictures/', null=True)
+    picture = models.ImageField(default="profile_pictures/default.svg", upload_to='profile_pictures/', null=True)
     rank = models.CharField(max_length=20, choices=BELT_RANKS, null=True, blank=True)
     last_promoted = models.DateField(default=timezone.localdate)
 

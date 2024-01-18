@@ -1,4 +1,3 @@
-{% load static %}
 {% for profile in profiles %}
 {% if profile.name != 'admin' %}
 <div class="profileListProfile">
@@ -8,7 +7,7 @@
       class="profileListProfile__author"
     >
       <div class="avatar avatar--small">
-        <img src="{% static profile.picture.url %}" />
+        <img src="{{profile.picture.url}}" />
       </div>
       <span>{{profile.name}} @{{profile.user.username}}</span>
     </a>

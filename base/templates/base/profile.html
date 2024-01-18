@@ -1,5 +1,4 @@
 {% extends 'main.html' %} {% block content%}
-{% load static %}
 <main class="profile-page layout layout--3">
   <div class="container">
     {% include 'base/side_nav.html' %}
@@ -9,7 +8,7 @@
       <div class="profile">
         <div class="profile__avatar">
           <div class="avatar avatar--large active">
-            <img src="{% static user.profile.picture.url %}" />
+            <img src="{{user.profile.picture.url}}" />
           </div>
           {% if request.user == user %}
           <a href="{% url 'update-user' %}" class="btn btn--main btn--pill"
