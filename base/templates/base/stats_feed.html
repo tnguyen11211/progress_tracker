@@ -1,6 +1,6 @@
 <div class="profileList__header">
   <h2>Attendances</h2>
-  {% if request.user == user %}
+  {% if request.user == user or request.user.is_superuser %}
   <a class="btn btn--mini" href="{% url 'create-attendance' %}">
     <svg
       version="1.1"
@@ -24,7 +24,7 @@
     <div class="stats__content">
       <span>Date: {{attendance.date}}</span>
     </div>
-    {% if request.user == user %}
+    {% if request.user == user or request.user.is_superuser%}
     <div class="stats__actions">
       <a href="{% url 'update-attendance' attendance.id %}"> edit </a>
       <a href="{% url 'delete-attendance' attendance.id %}"> delete </a>
@@ -36,7 +36,7 @@
 </div>
 <div class="profileList__header">
   <h2>Tournaments</h2>
-  {% if request.user == user %}
+  {% if request.user == user or request.user.is_superuser%}
   <a class="btn btn--mini" href="{% url 'create-tournament' %}">
     <svg
       version="1.1"
@@ -61,7 +61,7 @@
       <span>Event: {{tournament.event}}</span>
       <span>Date: {{tournament.date}}</span>
     </div>
-    {% if request.user == user %}
+    {% if request.user == user or request.user.is_superuser %}
     <div class="stats__actions">
       <a href="{% url 'update-tournament' tournament.id %}"> edit </a>
       <a href="{% url 'delete-tournament' tournament.id %}"> delete </a>
@@ -74,7 +74,7 @@
 {% if 'Black' in user.profile.rank %}
 <div class="profileList__header">
   <h2>Leadership Hours</h2>
-  {% if request.user == user %}
+  {% if request.user == user or request.user.is_superuser %}
   <a class="btn btn--mini" href="{% url 'create-leadership-hours' %}">
     <svg
       version="1.1"
@@ -100,7 +100,7 @@
       <span>Date: {{leadership.date}}</span>
       <span>Hours: {{leadership.hours}}</span>
     </div>
-    {% if request.user == user %}
+    {% if request.user == user or request.user.is_superuser %}
     <div class="stats__actions">
       <a href="{% url 'update-leadership-hours' leadership.id %}"> edit </a>
       <a href="{% url 'delete-leadership-hours' leadership.id %}"> delete </a>
