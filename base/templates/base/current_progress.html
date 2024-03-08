@@ -3,15 +3,14 @@
 </div>
 <div class="profileListProfile">
   <div class="profileListProfile__header">
-    <a
+    {% comment %} <a
       href="{% url 'user-profile' user.id %}"
       class="profileListProfile__author"
     >
       <div class="avatar avatar--small">
         <img src="{{user.profile.picture.url}}" />
       </div>
-      <span>@{{user.username}}</span>
-    </a>
+    </a> {% endcomment %}
   </div>
   <div class="profileListProfile__content">
     <div class="circular-progress-wrapper">
