@@ -1,5 +1,5 @@
 {% for profile in profiles %}
-{% if profile.name != 'admin' %}
+{% if not profile.user.is_superuser %}
 <div class="profileListProfile">
   <div class="profileListProfile__header">
     <a
@@ -9,7 +9,7 @@
       <div class="avatar avatar--small">
         <img src="{{profile.picture.url}}" />
       </div>
-      <span>{{profile.name}}</span>
+      <span>{{profile.user.first_name}}</span>
     </a>
   </div>
   <div class="profileListProfile__content">

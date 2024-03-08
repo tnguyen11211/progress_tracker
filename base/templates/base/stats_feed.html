@@ -1,7 +1,7 @@
 <div class="profileList__header">
   <h2>Attendances</h2>
   {% if request.user == user or request.user.is_superuser %}
-  <a class="btn btn--mini" href="{% url 'create-attendance' %}">
+  <a class="btn btn--mini" href="{% url 'create-attendance' user.profile.id %}">
     <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -37,7 +37,7 @@
 <div class="profileList__header">
   <h2>Tournaments</h2>
   {% if request.user == user or request.user.is_superuser%}
-  <a class="btn btn--mini" href="{% url 'create-tournament' %}">
+  <a class="btn btn--mini" href="{% url 'create-tournament' user.profile.id %}">
     <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -75,7 +75,7 @@
 <div class="profileList__header">
   <h2>Leadership Hours</h2>
   {% if request.user == user or request.user.is_superuser %}
-  <a class="btn btn--mini" href="{% url 'create-leadership-hours' %}">
+  <a class="btn btn--mini" href="{% url 'create-leadership-hours' user.profile.id %}">
     <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -114,7 +114,7 @@
 <div class="profileList__header">
   <h2>Practical Scores</h2>
   {% if request.user.is_superuser %}
-  <a class="btn btn--mini" href="{% url 'create-practical-score' %}">
+  <a class="btn btn--mini" href="{% url 'create-practical-score' user.profile.id %}">
     <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"

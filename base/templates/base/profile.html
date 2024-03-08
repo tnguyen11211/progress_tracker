@@ -10,15 +10,15 @@
           <div class="avatar avatar--large active">
             <img src="{{user.profile.picture.url}}" />
           </div>
-          {% if request.user == user %}
-          <a href="{% url 'update-user' %}" class="btn btn--main btn--pill"
+          {% if request.user == user or request.user.is_superuser%}
+          <a href="{% url 'update-user' user.id %}" class="btn btn--main btn--pill"
             >Edit Profile</a
           >
           {% endif %}
         </div>
         <div class="profile__info">
           <span>
-            <h3>{{user.profile.name}}</h3>
+            <h3>{{user.first_name}}</h3>
           </span>
           <p>Rank: {{user.profile.rank}}</p>
           <p>Last Promoted: {{user.profile.last_promoted}}</p>

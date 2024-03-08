@@ -5,7 +5,7 @@
     <div class="layout__box">
       <div class="layout__boxHeader">
         <div class="layout__boxTitle">
-          <a href="{% url 'user-profile' user.id %}">
+          <a href="{% url 'user-profile' id %}">
             <svg
               version="1.1"
               xmlns="http://www.w3.org/2000/svg"
@@ -34,10 +34,6 @@
             {{profile_form.picture}}
           </div>
           <div class="form__group">
-            <label for="profile__name">Name</label>
-            {{profile_form.name}}
-          </div>
-          <div class="form__group">
             <label for="profile__rank">Rank</label>
             {{profile_form.rank}}
           </div>
@@ -49,12 +45,21 @@
             <label for="profile__about">About</label>
             {{profile_form.about}}
           </div>
-          {% csrf_token %} {% for field in user_form %}
+          {% csrf_token %} 
+          {% for field in user_form %}
+          {% if field.label == 'First name' %}
+          <div class="form__group">
+            <label for="First name">Name</label>
+            {{field}}
+          </div>
+          {% else %}
           <div class="form__group">
             <label for="{{field.label}}">{{field.label}}</label>
             {{field}}
           </div>
-          {% endfor %} {% if messages %}
+          {% endif %}
+          {% endfor %} 
+          {% if messages %}
           <br />
           <ul class="messages">
             {% for message in messages %}
@@ -64,7 +69,7 @@
           {% endif %}
 
           <div class="form__action">
-            <a class="btn btn--dark" href="{{request.META.HTTP_REFERER}}"
+            <a class="btn btn--dark" href="{% url 'user-profile' id %}"
               >Cancel</a
             >
             <button class="btn btn--main" type="submit">Update</button>

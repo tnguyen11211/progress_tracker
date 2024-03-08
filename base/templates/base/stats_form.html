@@ -5,7 +5,7 @@
     <div class="layout__box">
       <div class="layout__boxHeader">
         <div class="layout__boxTitle">
-          <a href="{{ request.META.HTTP_REFERER }}">
+          <a href="{% url 'user-profile' id %}">
             <svg
               version="1.1"
               xmlns="http://www.w3.org/2000/svg"
@@ -40,18 +40,25 @@
           <input
             type="hidden"
             name="next"
-            value="{{ request.META.HTTP_REFERER }}"
+            value="{% url 'user-profile' id %}"
           />
 
           {% for field in form %}
+          {% if field.label == 'Profile' and request.user.is_superuser %}
           <div class="form__group">
             <label for="{{field.label}}">{{field.label}}</label>
             {{field}}
           </div>
+          {% elif field.label != 'Profile' %}
+          <div class="form__group">
+            <label for="{{field.label}}">{{field.label}}</label>
+            {{field}}
+          </div>
+          {% endif %}
           {% endfor %}
 
           <div class="form__action">
-            <a class="btn btn--dark" href="{{ request.META.HTTP_REFERER }}"
+            <a class="btn btn--dark" href="{% url 'user-profile' id %}"
               >Cancel</a
             >
             {% if 'attendance' in request.path %}
