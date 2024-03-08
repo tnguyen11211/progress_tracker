@@ -13,7 +13,7 @@
       <span>{{profile.name}} @{{profile.user.username}}</span>
     </a>
   </div>
-  <div class="profileListProfile__content">
+  {% comment %} <div class="profileListProfile__content">
     <div class="circular-progress-wrapper">
       <div class="circular-progress" id="attendance">
         <span class="value-wrapper">
@@ -60,7 +60,7 @@
       </div>
       <span class="progress-label">Practical Score</span>
     </div>
-  </div>
+  </div> {% endcomment %}
 </div>
 {% endif %}
 {% endfor %}
