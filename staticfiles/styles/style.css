@@ -224,7 +224,7 @@ a {
 .dropdown-menu {
   z-index: 111;
   position: absolute;
-  top: 5rem;
+  top: 8rem;
   right: 0.5rem;
   background: var(--color-dark-light);
   border-radius: 5px;

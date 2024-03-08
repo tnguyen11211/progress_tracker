@@ -121,5 +121,5 @@ if (conversationThread) conversationThread.scrollTop = conversationThread.scroll
 
   animateAll("attendance", 15, 24, "orangered");
   animateAll("tournament", 360, 1, "gold");
-  animateAll("hours", 14.4, 25, "mediumseagreen");
+  animateAll("hours", 30, 12, "mediumseagreen");
   animateAll("practical", 3.6, 100, "dodgerblue");
