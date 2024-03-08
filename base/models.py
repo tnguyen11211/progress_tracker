@@ -41,7 +41,6 @@ class Profile(models.Model):
     )
     
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=30, null=True)
     about = models.TextField(null=True, blank=True)
     picture = models.ImageField(default="profile_pictures/default.svg", upload_to='profile_pictures/', null=True)
     rank = models.CharField(max_length=20, choices=BELT_RANKS, null=True, blank=True)
@@ -105,7 +104,7 @@ class Attendance(models.Model):
     date = models.DateField(default=timezone.localdate)
 
     def __str__(self):
-        return self.__class__.__name__ + " for " + self.profile.name + " on " + self.date.strftime("%b %d, %Y")
+        return self.__class__.__name__ + " for " + self.profile.user.first_name + " on " + self.date.strftime("%b %d, %Y")
     
     class Meta:
         ordering = ['-date']
@@ -116,7 +115,7 @@ class Tournament(models.Model):
     date = models.DateField(default=timezone.localdate)
     
     def __str__(self):
-        return self.__class__.__name__ + " for " + self.profile.name + " for " + self.event + " on " + self.date.strftime("%b %d, %Y")
+        return self.__class__.__name__ + " for " + self.profile.user.first_name + " for " + self.event + " on " + self.date.strftime("%b %d, %Y")
     
     class Meta:
         ordering = ['-date', 'event']
@@ -128,7 +127,7 @@ class LeadershipHours(models.Model):
     hours = models.IntegerField(null=True)
 
     def __str__(self):
-        string = self.__class__.__name__ + " for " + self.profile.name + " for " + self.event + " on " + self.date.strftime("%b %d, %Y") + " for " + str(self.hours) + " hours "
+        string = self.__class__.__name__ + " for " + self.profile.user.first_name + " for " + self.event + " on " + self.date.strftime("%b %d, %Y") + " for " + str(self.hours) + " hours "
         return string
 
 class PracticalScore(models.Model):
@@ -137,7 +136,7 @@ class PracticalScore(models.Model):
     score = models.IntegerField(null=True)
 
     def __str__(self):
-        string = self.__class__.__name__ + " for " + self.profile.name + " on " + self.date.strftime("%b %d, %Y") + " with score " + str(self.score)
+        string = self.__class__.__name__ + " for " + self.profile.user.first_name + " on " + self.date.strftime("%b %d, %Y") + " with score " + str(self.score)
         return string
     
     class Meta:

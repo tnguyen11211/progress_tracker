@@ -17,12 +17,12 @@ class RoomForm(ModelForm):
 class UserForm(ModelForm):
     class Meta:
         model = User
-        fields = ['username', 'email']
+        fields = ['username', 'first_name', 'email']
 
 class ProfileForm(ModelForm):
     class Meta:
         model = Profile
-        fields = ['picture', 'name', 'rank', 'last_promoted', 'about']
+        fields = ['picture', 'rank', 'last_promoted', 'about']
         widgets = {
             'last_promoted': DateInput(attrs=dict(max = timezone.localdate)),
         }
@@ -30,7 +30,7 @@ class ProfileForm(ModelForm):
 class AttendanceForm(ModelForm):
     class Meta:
         model = Attendance
-        fields = ['date']
+        fields = ['profile', 'date']
         widgets = {
             'date': DateInput(attrs=dict(max = timezone.localdate)),
         }
@@ -38,7 +38,7 @@ class AttendanceForm(ModelForm):
 class TournamentForm(ModelForm):
     class Meta:
         model = Tournament
-        fields = ['event', 'date']
+        fields = ['profile', 'event', 'date']
         widgets = {
             'date': DateInput(attrs=dict(max = timezone.localdate)),
         }
@@ -46,7 +46,7 @@ class TournamentForm(ModelForm):
 class LeadershipHoursForm(ModelForm):
     class Meta:
         model = LeadershipHours
-        fields = ['event', 'date', 'hours']
+        fields = ['profile', 'event', 'date', 'hours']
         widgets = {
             'date': DateInput(attrs=dict(max = timezone.localdate)),
         }
@@ -54,7 +54,7 @@ class LeadershipHoursForm(ModelForm):
 class PracticalScoreForm(ModelForm):
     class Meta:
         model = PracticalScore
-        fields = ['date', 'score']
+        fields = ['profile', 'date', 'score']
         widgets = {
             'date': DateInput(attrs=dict(max = timezone.localdate)),
         }
