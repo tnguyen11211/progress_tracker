@@ -17,26 +17,26 @@ urlpatterns = [
     path('delete-message/<str:pk>/', views.deleteMessage, name="delete-message"),
 
     path('profile/<str:pk>/attendances/', views.statsPage, name="attendances"),
-    path('create-attendance/', views.createAttendance, name="create-attendance"),
+    path('profile/<str:pk>/create-attendance/', views.createAttendance, name="create-attendance"),
     path('update-attendance/<str:pk>/', views.updateAttendance, name="update-attendance"),
     path('delete-attendance/<str:pk>/', views.deleteAttendance, name="delete-attendance"),
 
     path('profile/<str:pk>/tournaments/', views.statsPage, name="tournaments"),
-    path('create-tournament/', views.createTournament, name="create-tournament"),
+    path('profile/<str:pk>/create-tournament/', views.createTournament, name="create-tournament"),
     path('update-tournament/<str:pk>/', views.updateTournament, name="update-tournament"),
     path('delete-tournament/<str:pk>/', views.deleteTournament, name="delete-tournament"),
 
     path('profile/<str:pk>/leadership-hours/', views.statsPage, name="leadership-hours"),
-    path('create-leadership-hours/', views.createLeadershipHours, name="create-leadership-hours"),
+    path('profile/<str:pk>/create-leadership-hours/', views.createLeadershipHours, name="create-leadership-hours"),
     path('update-leadership-hours/<str:pk>/', views.updateLeadershipHours, name="update-leadership-hours"),
     path('delete-leadership-hours/<str:pk>/', views.deleteLeadershipHours, name="delete-leadership-hours"),
 
     path('profile/<str:pk>/practical-scores/', views.statsPage, name="practical-scores"),
-    path('create-practical-score/', views.createPracticalScore, name="create-practical-score"),
+    path('profile/<str:pk>/create-practical-score/', views.createPracticalScore, name="create-practical-score"),
     path('update-practical-score/<str:pk>/', views.updatePracticalScore, name="update-practical-score"),
     path('delete-practical-score/<str:pk>/', views.deletePracticalScore, name="delete-practical-score"),
     
-    path('update-user/', views.updateUser, name="update-user"),
+    path('update-user/<str:pk>/', views.updateUser, name="update-user"),
 
     path('topics/', views.topicsPage, name="topics"),
     path('activity/', views.activityPage, name="activity"),
