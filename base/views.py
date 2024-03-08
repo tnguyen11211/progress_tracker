@@ -16,7 +16,7 @@ def home(request):
 
     profiles = Profile.objects.filter(
         Q(user__username__icontains=q) |
-        Q(name__icontains=q)
+        Q(user__first_name__icontains=q)
     )
 
     context = {'profiles': profiles}
@@ -51,6 +51,7 @@ def logoutUser(request):
 def registerPage(request):
     page = 'register'
     form = UserCreationForm()
+
     context = {'page': page, 'form': form}
 
     if request.method == 'POST':
@@ -58,6 +59,8 @@ def registerPage(request):
         if form.is_valid():
             user = form.save(commit=False)
             # change or clean form data here
+            user.first_name = request.POST.get('name')
+            user.email = request.POST.get('email')
             user.save()
             login(request, user)
             return redirect('home')
@@ -85,8 +88,12 @@ def userProfile(request, pk):
     return render(request, 'base/profile.html', context)
 
 @login_required(login_url='login')
-def updateUser(request):
-    user = request.user
+def updateUser(request, pk):
+    if request.user.id == pk or request.user.is_superuser:
+        user = User.objects.get(id=pk)
+    else:
+        user = request.user
+    id = user.id
     user_form = UserForm(instance=user)
     profile_form = ProfileForm(instance=user.profile)
 
@@ -103,12 +110,17 @@ def updateUser(request):
             for error in profile_form.errors:
                 messages.error(request, profile_form.errors.get(error))
 
-    return render(request, 'base/update-user.html', {'user_form': user_form, 'profile_form': profile_form})
+    return render(request, 'base/update-user.html', {'user_form': user_form, 'profile_form': profile_form, 'id': id})
 
 @login_required(login_url='login')
-def createAttendance(request):
-    profile = request.user.profile
-    form = AttendanceForm()
+def createAttendance(request, pk):
+    if request.user.profile.id == pk or request.user.is_superuser:
+        profile = Profile.objects.get(id=pk)
+    else:
+        profile = Profile.objects.get(user=request.user)
+
+    id = profile.user.id
+    form = AttendanceForm(initial={'profile': profile})
     create_update = "Create"
 
     if request.method == 'POST':
@@ -119,7 +131,7 @@ def createAttendance(request):
         next = request.POST.get('next', '/')
         return redirect(next)
 
-    context = {'form': form, 'create_update': create_update}
+    context = {'form': form, 'create_update': create_update, 'id': id}
     return render(request, 'base/stats_form.html', context)
 
 @login_required(login_url='login')
@@ -127,8 +139,9 @@ def updateAttendance(request, pk):
     attendance = Attendance.objects.get(id=pk)
     form = AttendanceForm(instance=attendance)
     create_update = "Update"
+    id = Profile.objects.get(attendance=attendance).user.id
 
-    if request.user != attendance.profile.user:
+    if request.user != attendance.profile.user and not request.user.is_superuser:
         return HttpResponse('Invalid operation. Users can only edit their own attendances.')
 
     if request.method == 'POST':
@@ -137,14 +150,15 @@ def updateAttendance(request, pk):
         next = request.POST.get('next', '/')
         return redirect(next)
 
-    context = {'form': form, 'create_update': create_update}
+    context = {'form': form, 'create_update': create_update, 'id': id}
     return render(request, 'base/stats_form.html', context)
 
 @login_required(login_url='login')
 def deleteAttendance(request, pk):
     attendance = Attendance.objects.get(id=pk)
+    id = Profile.objects.get(attendance=attendance).user.id
 
-    if request.user != attendance.profile.user:
+    if request.user != attendance.profile.user and not request.user.is_superuser:
         return HttpResponse('Invalid operation. Users can only delete attendances they have created.')
 
     if request.method == 'POST':
@@ -152,13 +166,17 @@ def deleteAttendance(request, pk):
         next = request.POST.get('next', '/')
         return redirect(next)
 
-    return render(request, 'base/delete.html', {'obj': attendance})
+    return render(request, 'base/delete.html', {'obj': attendance, 'id': id})
 
 @login_required(login_url='login')
-def createTournament(request):
-    profile = request.user.profile
-    form = TournamentForm()
+def createTournament(request, pk):
+    if request.user.profile.id == pk or request.user.is_superuser:
+        profile = Profile.objects.get(id=pk)
+    else:
+        profile = Profile.objects.get(user=request.user)
+    form = TournamentForm(initial={'profile': profile})
     create_update = "Create"
+    id = profile.user.id
 
     if request.method == 'POST':
         Tournament.objects.create(
@@ -169,7 +187,7 @@ def createTournament(request):
         next = request.POST.get('next', '/')
         return redirect(next)
 
-    context = {'form': form, 'create_update': create_update}
+    context = {'form': form, 'create_update': create_update, 'id': id}
     return render(request, 'base/stats_form.html', context)
 
 @login_required(login_url='login')
@@ -177,8 +195,9 @@ def updateTournament(request, pk):
     tournament = Tournament.objects.get(id=pk)
     form = TournamentForm(instance=tournament)
     create_update = "Update"
+    id = Profile.objects.get(tournament=tournament).user.id
 
-    if request.user != tournament.profile.user:
+    if request.user != tournament.profile.user and not request.user.is_superuser:
         return HttpResponse('Invalid operation. Users can only edit their own tournaments.')
 
     if request.method == 'POST':
@@ -188,14 +207,15 @@ def updateTournament(request, pk):
         next = request.POST.get('next', '/')
         return redirect(next)
 
-    context = {'form': form, 'create_update': create_update}
+    context = {'form': form, 'create_update': create_update, 'id': id}
     return render(request, 'base/stats_form.html', context)
 
 @login_required(login_url='login')
 def deleteTournament(request, pk):
     tournament = Tournament.objects.get(id=pk)
+    id = Profile.objects.get(tournament=tournament).user.id
 
-    if request.user != tournament.profile.user:
+    if request.user != tournament.profile.user and not request.user.is_superuser:
         return HttpResponse('Invalid operation. Users can only delete tournaments they have created.')
 
     if request.method == 'POST':
@@ -203,13 +223,17 @@ def deleteTournament(request, pk):
         next = request.POST.get('next', '/')
         return redirect(next)
 
-    return render(request, 'base/delete.html', {'obj': tournament})
+    return render(request, 'base/delete.html', {'obj': tournament, 'id': id})
 
 @login_required(login_url='login')
-def createLeadershipHours(request):
-    profile = request.user.profile
-    form = LeadershipHoursForm()
+def createLeadershipHours(request, pk):
+    if request.user.profile.id == pk or request.user.is_superuser:
+        profile = Profile.objects.get(id=pk)
+    else:
+        profile = Profile.objects.get(user=request.user)
+    form = LeadershipHoursForm(initial={'profile': profile})
     create_update = "Create"
+    id = profile.user.id
 
     if request.method == 'POST':
         LeadershipHours.objects.create(
@@ -221,7 +245,7 @@ def createLeadershipHours(request):
         next = request.POST.get('next', '/')
         return redirect(next)
 
-    context = {'form': form, 'create_update': create_update}
+    context = {'form': form, 'create_update': create_update, 'id': id}
     return render(request, 'base/stats_form.html', context)
 
 @login_required(login_url='login')
@@ -229,8 +253,9 @@ def updateLeadershipHours(request, pk):
     leadership_hour = LeadershipHours.objects.get(id=pk)
     form = LeadershipHoursForm(instance=leadership_hour)
     create_update = "Update"
+    id = Profile.objects.get(leadership_hour=leadership_hour).user.id
 
-    if request.user != leadership_hour.profile.user:
+    if request.user != leadership_hour.profile.user and not request.user.is_superuser:
         return HttpResponse('Invalid operation. Users can only edit their own leadership hours.')
 
     if request.method == 'POST':
@@ -241,14 +266,15 @@ def updateLeadershipHours(request, pk):
         next = request.POST.get('next', '/')
         return redirect(next)
 
-    context = {'form': form, 'create_update': create_update}
+    context = {'form': form, 'create_update': create_update, 'id': id}
     return render(request, 'base/stats_form.html', context)
 
 @login_required(login_url='login')
 def deleteLeadershipHours(request, pk):
     leadership_hour = LeadershipHours.objects.get(id=pk)
+    id = Profile.objects.get(leadership_hour=leadership_hour).user.id
 
-    if request.user != leadership_hour.profile.user:
+    if request.user != leadership_hour.profile.user and not request.user.is_superuser:
         return HttpResponse('Invalid operation. Users can only delete leadership hours they have created.')
 
     if request.method == 'POST':
@@ -256,14 +282,15 @@ def deleteLeadershipHours(request, pk):
         next = request.POST.get('next', '/')
         return redirect(next)
 
-    return render(request, 'base/delete.html', {'obj': leadership_hour})
+    return render(request, 'base/delete.html', {'obj': leadership_hour, 'id': id})
 
 @login_required(login_url='login')
 @user_passes_test(lambda u: u.is_superuser)
-def createPracticalScore(request):
-    profile = request.user.profile
-    form = PracticalScoreForm()
+def createPracticalScore(request, pk):
+    profile = Profile.objects.get(id=pk)
+    form = PracticalScoreForm(initial={'profile': profile})
     create_update = "Create"
+    id = profile.user.id
 
     if request.method == 'POST':
         PracticalScore.objects.create(
@@ -274,7 +301,7 @@ def createPracticalScore(request):
         next = request.POST.get('next', '/')
         return redirect(next)
 
-    context = {'form': form, 'create_update': create_update}
+    context = {'form': form, 'create_update': create_update, 'id': id}
     return render(request, 'base/stats_form.html', context)
 
 @login_required(login_url='login')
@@ -283,8 +310,9 @@ def updatePracticalScore(request, pk):
     practical_score = PracticalScore.objects.get(id=pk)
     form = PracticalScoreForm(instance=practical_score)
     create_update = "Update"
+    id = Profile.objects.get(practical_score=practical_score).user.id
 
-    if request.user != practical_score.profile.user:
+    if request.user != practical_score.profile.user and not request.user.is_superuser:
         return HttpResponse('Invalid operation. Users can only edit their own practical scores.')
 
     if request.method == 'POST':
@@ -294,15 +322,16 @@ def updatePracticalScore(request, pk):
         next = request.POST.get('next', '/')
         return redirect(next)
 
-    context = {'form': form, 'create_update': create_update}
+    context = {'form': form, 'create_update': create_update, 'id': id}
     return render(request, 'base/stats_form.html', context)
 
 @login_required(login_url='login')
 @user_passes_test(lambda u: u.is_superuser)
 def deletePracticalScore(request, pk):
     practical_score = PracticalScore.objects.get(id=pk)
+    id = Profile.objects.get(practical_score=practical_score).user.id
 
-    if request.user != practical_score.profile.user:
+    if request.user != practical_score.profile.user and not request.user.is_superuser:
         return HttpResponse('Invalid operation. Users can only delete practical scores they have created.')
 
     if request.method == 'POST':
@@ -310,7 +339,7 @@ def deletePracticalScore(request, pk):
         next = request.POST.get('next', '/')
         return redirect(next)
 
-    return render(request, 'base/delete.html', {'obj': practical_score})
+    return render(request, 'base/delete.html', {'obj': practical_score, 'id': id})
 
 @login_required(login_url='login')
 def statsPage(request, pk):
