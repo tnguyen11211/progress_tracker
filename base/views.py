@@ -17,7 +17,7 @@ def home(request):
     profiles = Profile.objects.filter(
         Q(user__username__icontains=q) |
         Q(name__icontains=q)
-    )
+    ).order_by('name')
 
     context = {'profiles': profiles}
     return render(request, 'base/home.html', context)
